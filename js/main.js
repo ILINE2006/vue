@@ -51,10 +51,6 @@ Vue.component('product-details', {
           >
           </div>
     
-          <div class="cart">
-            <p>Cart({{ cart }})</p>
-          </div>
-  
           <button
             v-on:click="addToCart"
             :disabled="!inStock"
@@ -65,7 +61,7 @@ Vue.component('product-details', {
           
           <button
             v-on:click="removeFromCart"
-            :disabled="cart === 0"
+            :disabled="cartEmpty"
           >
             Delete to cart
           </button>
@@ -77,7 +73,6 @@ Vue.component('product-details', {
         </div>
       </div>
     `,
-    
     data() {
       return {
         product: "Socks",
@@ -101,31 +96,21 @@ Vue.component('product-details', {
             variantQuantity: 0
           }
         ],
-        cart: 0,
         onSale: true,
-        link: "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=socks"
+        link: "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=socks    "
       }
     },
-    
     methods: {
       addToCart() {
-        this.cart += 1
-        console.log("Добавили товар, сейчас в корзине: " + this.cart)
+        this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId)
       },
       removeFromCart() {
-        if (this.cart > 0) {
-          this.cart -= 1
-          console.log("Убрали товар, сейчас в корзине: " + this.cart)
-        } else {
-          console.log("Корзина уже пустая!")
-        }
+        this.$emit('remove-from-cart')
       },
       updateProduct(index) {
         this.selectedVariant = index
-        console.log('Выбран индекс:', index)
       }
     },
-    
     computed: {
       title() {
         return this.brand + ' ' + this.product
@@ -149,14 +134,25 @@ Vue.component('product-details', {
         } else {
           return 2.99
         }
+      },
+      cartEmpty() {
+        return this.$parent.cart.length === 0
       }
     }
   })
   
-
   let app = new Vue({
     el: '#app',
-    data: {  
-      premium: true
+    data: {
+      premium: true,
+      cart: []
+    },
+    methods: {
+      updateCart(id) {
+        this.cart.push(id)
+      },
+      removeFromCart(id) {
+        this.cart.pop(id)
+      }
     }
   })
