@@ -72,6 +72,12 @@ Vue.component('product-review', {
   methods: {
     onSubmit() {
       if (this.name && this.review && this.rating && this.recommend) {
+
+        if (this.rating < 4 && this.recommend == 'yes') {
+          this.errors.push("Cannot recommend product with rating below 4.")
+          return
+        }
+
         let productReview = {
           name: this.name,
           review: this.review,
